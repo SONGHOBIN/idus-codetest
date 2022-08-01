@@ -1,0 +1,54 @@
+package com.common.jwt;
+
+import java.io.IOException;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Component
+public class JwtFilter implements Filter {
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+
+        String jwt = resolveToken(httpServletRequest);
+        String requestURI = httpServletRequest.getRequestURI();
+
+        if (StringUtils.hasText(jwt)) {
+        	if(JwtProvider.validateToken(jwt)) {
+        		Authentication authentication = JwtProvider.getAuthentication(jwt);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                
+                log.info("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}", authentication.getName(), requestURI);
+        	} else {
+        		log.info("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
+        	}
+        }
+
+        chain.doFilter(request, response);
+	}
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        
+        return null;
+    }
+}

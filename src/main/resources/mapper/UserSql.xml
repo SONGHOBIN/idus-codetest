@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.api.mapper.UserMapper">
+	<resultMap type="com.api.entity.UserEntity" id="userMap">
+		<id property="idx" column="IDX"/>
+		<result property="userName" column="USER_NAME"/>
+		<result property="userNickname" column="USER_NICKNAME"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="phoneNumber" column="PHONE_NUMBER"/>
+		<result property="email" column="EMAIL"/>
+		<result property="gender" column="GENDER"/>
+		<result property="createdDateTime" column="CREATED_DATE_TIME"/>
+		<result property="updateDateTime" column="UPDATE_DATE_TIME"/>
+		<result property="orderEntity.orderNo" column="ORDER_NO"/>
+		<result property="orderEntity.userIdx" column="IDX"/>
+		<result property="orderEntity.productName" column="PRODUCT_NAME"/>
+		<result property="orderEntity.orderDateTime" column="ORDER_DATE_TIME"/>
+	</resultMap>
+	
+	<select id="selectUsers" resultMap="userMap">
+		/* [UserSql.xml][selectUsers] : 유저 조회 : 다중 */
+		SELECT 
+			A.*
+			, B.ORDER_NO
+			, B.PRODUCT_NAME
+			, B.ORDER_DATE_TIME
+		FROM (
+			SELECT
+				U.IDX
+				, U.USER_NAME
+				, U.USER_NICKNAME
+				, U.PASSWORD
+				, U.PHONE_NUMBER
+				, U.EMAIL
+				, U.GENDER
+				, FORMATDATETIME(U.CREATED_DATE_TIME, 'yyyy-MM-dd HH:mm:ss') AS CREATED_DATE_TIME
+				, FORMATDATETIME(U.UPDATE_DATE_TIME, 'yyyy-MM-dd HH:mm:ss') AS UPDATE_DATE_TIME
+				, (SELECT ORDER_NO FROM TB_ORDER WHERE USER_IDX = U.IDX ORDER BY ORDER_DATE_TIME DESC LIMIT 1) AS LAST_ORDER_NO
+			FROM
+				TB_USER AS U
+			WHERE
+				1 = 1
+				<if test="userName != null and userName != ''">
+					AND USER_NAME LIKE '%' || #{userName} || '%'
+				</if>
+				<if test="email != null and email != ''">
+					AND EMAIL LIKE '%' || #{email} || '%'
+				</if>
+				ORDER BY U.CREATED_DATE_TIME ASC
+				<if test="page != null and page != '' and size != null and size != ''">
+					OFFSET (#{page} - 1) * #{size} ROW
+					FETCH NEXT #{size} ROW ONLY
+				</if>
+		) AS A LEFT OUTER JOIN TB_ORDER AS B ON A.LAST_ORDER_NO = B.ORDER_NO
+	</select>
+</mapper>
