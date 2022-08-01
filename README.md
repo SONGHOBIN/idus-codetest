@@ -25,6 +25,7 @@ mybatis         : org.mybatis:mybatis:3.5.10 , org.mybatis:mybatis-spring:2.0.7 
 ```
 
 # 요구사항 구현여부, 구현방법, 검증결과
+##### ※ JUnit Test : ApplicationTests.java 참고
 
 ##### 1. 회원 가입 [POST] - 구현여부 : 완
 ```json
