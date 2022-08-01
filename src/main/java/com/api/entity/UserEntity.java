@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @DynamicUpdate
 @DynamicInsert
 @Entity(name = "tb_user")
-@Table(name="TB_USER", indexes = @Index(name="i_user", columnList="idx, userName, email"))
+@Table(name="TB_USER")
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

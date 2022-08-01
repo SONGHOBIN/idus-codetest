@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicInsert;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @DynamicUpdate
 @DynamicInsert
 @Entity(name = "tb_order")
-@Table(name="TB_ORDER")
+@Table(name="TB_ORDER", indexes = @Index(name="i_order", columnList="userIdx"))
 public class OrderEntity {
 	@Id
 	@Column(columnDefinition="VARCHAR(12)", length=12, nullable=false)
