@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -26,7 +27,7 @@ import lombok.NoArgsConstructor;
 @DynamicUpdate
 @DynamicInsert
 @Entity(name = "tb_user")
-@Table(name="TB_USER")
+@Table(name="TB_USER", indexes = @Index(name="i_user", columnList="idx, userName, email"))
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
