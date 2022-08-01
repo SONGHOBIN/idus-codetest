@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,19 +27,14 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class JwtProvider implements InitializingBean {
+public class JwtProvider {
     private static final String AUTHORITIES_KEY = "auth";
 
     private static final String secret = "anNoLXNwcmluZ2Jvb3QtYW5kLWp3dC10dXRvcmlhbC10aGlzLWlzLWZvci1nZW5lcmF0aW5nLWp3dC1zZWNyZXRrZXktYmFzZTY0Cg==";
     private static final long tokenValidityInMilliseconds = 86400 * 1000;
 
-    private static Key key;
-    
-    @Override
-    public void afterPropertiesSet() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        key = Keys.hmacShaKeyFor(keyBytes);
-    }
+    private static byte[] keyBytes = Decoders.BASE64.decode(secret);
+    private static Key key = Keys.hmacShaKeyFor(keyBytes);
 
     public static String createToken(Authentication authentication) {
 		Map<String, Object> headers = new HashMap<>();
